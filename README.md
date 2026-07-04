@@ -24,7 +24,7 @@ pip install prepro-auto
 
 Watch a dataset go from messy to model-ready — review each fix, approve it, and watch the issue count drop to **0**.
 
-![PrePro Auto demo](https://raw.githubusercontent.com/Chilliflex/prepro_auto/main/docs/demo.gif)
+![PrePro Auto demo](https://raw.githubusercontent.com/Chilliflex/prepro_auto/main/docs/demo.mp4)
 
 <!--
   To record this GIF (≈15s, the single biggest thing that converts a visitor to a user):
