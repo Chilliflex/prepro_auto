@@ -30,8 +30,6 @@ Watch a dataset go from messy to model-ready — review each fix, approve it, an
 
 > **Performance shown in the GIF:** When every AI recommendation is applied automatically (**AI-only mode**), the demonstrated workflow achieves **97.2% accuracy**. Enabling **Human-in-the-Loop (HITL)** review—where users approve or override recommendations before execution—raises the final accuracy to **99.9%** on our benchmark evaluations.
 
-*(Recording in progress — until then, the [Screenshots](#screenshots) section below shows every step.)*
-
 ---
 
 ## Contents
