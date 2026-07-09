@@ -28,7 +28,9 @@ Watch a dataset go from messy to model-ready — review each fix, approve it, an
 
 **▶ Click the GIF to watch the full walkthrough in HD on GitHub.**
 
-**Direct video link:** https://github.com/Chilliflex/prepro_auto/blob/main/examples/Bengaluru_House_Prices_Workflow.mp4
+📦 **GitHub Repository:** https://github.com/Chilliflex/prepro_auto
+
+🎥 **Demo Video:** https://github.com/Chilliflex/prepro_auto/blob/main/examples/Bengaluru_House_Prices_Workflow.mp4
 
 > **Performance shown in the GIF:** When every AI recommendation is applied automatically (**AI-only mode**), the demonstrated workflow achieves **97.2% accuracy**. Enabling **Human-in-the-Loop (HITL)** review—where users approve or override recommendations before execution—raises the final accuracy to **99.9%** on our benchmark evaluations.
 
