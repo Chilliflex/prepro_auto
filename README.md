@@ -520,9 +520,6 @@ For the full table organized by category, see [Section 2 — Preprocessing funct
 - [Complete Guide (PDF)](https://github.com/Chilliflex/prepro_auto/blob/main/docs/PrePro_Auto_Complete_Guide.pdf) — project overview, architecture, all ML/stats models used, accuracy benchmarks, full user guide for notebook and web UI
 - Interactive Swagger at `http://localhost:8000/docs` (once running)
 
-## Contributing
-
-Contributions welcome — bugs, tests, docs, and features. See [CONTRIBUTING.md](CONTRIBUTING.md) to get started.
 
 ## License
 
