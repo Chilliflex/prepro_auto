@@ -3,7 +3,6 @@
 [![PyPI version](https://img.shields.io/pypi/v/prepro-auto.svg)](https://pypi.org/project/prepro-auto/)
 [![Python](https://img.shields.io/pypi/pyversions/prepro-auto.svg)](https://pypi.org/project/prepro-auto/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://img.shields.io/badge/tests-1013%20passing-brightgreen.svg)](https://pypi.org/project/prepro-auto/)
 [![Downloads](https://static.pepy.tech/badge/prepro-auto)](https://pepy.tech/project/prepro-auto)
 
 **AI-assisted tabular data preprocessing with human-in-the-loop control.**
@@ -739,15 +738,23 @@ Start the server and open `/docs` for generated request/response schemas. `/api/
 
 Use the exact job ID from the UI or `session.job_id` for dataset routes. Re-uploading a filename does not attach an API client to its earlier job.
 
-## Updating to 3.0.0
+## Updating to 4.0.0
+
+Version 4.0.0 removes the one-call automatic cleaning API and the bulk cleaning
+button. Open a dataset with `launch_file()` or `launch()`, inspect the Clean
+stages in the workbench, review decisions, execute selected stages, and fetch
+the result with `session.current()`. Existing stage-level auto-approval rules
+remain unchanged. For prediction, retain the target in its original units and
+export the fitted training pipeline; review its input contract before connecting
+a frontend.
 
 ```cmd
-python -m pip install --upgrade "prepro-auto==3.0.0"
+python -m pip install --upgrade "prepro-auto==4.0.0"
 ```
 
 After installing a published release, restart existing notebook kernels and app servers. Copy the edited dataset's connection URL before restarting, then use `prepro_auto.connect(...)` to resume its stored history. Keep the same database/storage configuration. Pending CV comparisons must be rerun after a restart; completed saved model runs remain available.
 
-For maintainers preparing this release, see [PUBLISHING.md](https://github.com/Chilliflex/prepro_auto/blob/main/PUBLISHING.md) for build checks, TestPyPI verification and the explicit 3.0.0 upload commands. The distribution remains `prepro-auto`; the Python import and command remain `prepro_auto`.
+For maintainers preparing this release, see [PUBLISHING.md](https://github.com/Chilliflex/prepro_auto/blob/main/PUBLISHING.md) for build checks, TestPyPI verification and the explicit 4.0.0 upload commands. The distribution remains `prepro-auto`; the Python import and command remain `prepro_auto`.
 
 ## Documentation
 

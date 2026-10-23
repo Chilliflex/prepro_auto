@@ -1,3 +1,7 @@
 .ipynb_checkpoints/
 .DS_Store
 Thumbs.db
+
+# Generated example runtime data
+examples/prepro_auto.db
+examples/storage/
