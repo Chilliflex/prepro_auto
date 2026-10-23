@@ -67,13 +67,13 @@ import prepro_auto
 session = prepro_auto.launch_file(r"path\to\data", open_browser=True)
 ```
 
-**3. Apply Quickclean:**
+**3. Review and execute cleaning decisions:**
+
+Open the **Clean** section in the workbench. Inspect each stage's findings and actual-row evidence, choose the appropriate actions, then execute the stage. Pull the committed result into the notebook:
 
 ```python
-result = prepro_auto.quickclean(session, apply_all=True, verbose=False)
-
-display(result.df.head())
-print(result)
+df = session.current()
+display(df.head())
 ```
 
 **4. Keep notebook and UI changes in sync:**
@@ -85,7 +85,7 @@ df = session.current()  # Get the latest UI-edited data
 session.update(df)      # Push notebook edits to the UI
 ```
 
-Use the exact `session.url` printed by the notebook. Each `launch_file(path)` call or UI upload creates a separate dataset job, even for the same file. Quickclean with `session` updates that job; Quickclean with a path creates another job. `current()` reads committed changes from its own job, and `update()` refreshes UI tabs connected to that same job within a few seconds.
+Use the exact `session.url` printed by the notebook. Each `launch_file(path)` call or UI upload creates a separate dataset job, even for the same file. `current()` reads committed changes from its own job, and `update()` refreshes UI tabs connected to that same job within a few seconds.
 
 To resume a dataset already edited in the UI, click **Copy notebook connection** in the sidebar, or copy its full browser URL:
 
@@ -159,7 +159,6 @@ Tabular stages cover Missing Values, Outliers, Scaling, Correlation and Encoding
 
 Click **Show actual rows** to expand up to five real rows captured from the version analysed. Missing-value and outlier findings show matching rows. Findings about whole-column structure show labelled context plus aggregate statistics. Each row includes its 1-based position in that dataset version and its index label. Positions exclude the header and are not guaranteed original CSV/Excel line numbers after transformations. Fewer matches produce fewer rows; older cards without saved evidence ask you to rerun analysis.
 
-**Quick clean** applies recommendations across the cleaning stages. In a notebook, `session.quickclean(apply_all=True, verbose=False)` cleans that same session. Default `apply_all=False` applies recommendations meeting the confidence threshold and leaves the rest for review. Applying every recommendation still requires checking its meaning for your dataset.
 
 ![Clean](https://raw.githubusercontent.com/Chilliflex/prepro_auto/main/docs/screenshots/Clean.png)
 
@@ -253,7 +252,7 @@ Use these four workflows from the Quickstart:
 |---|---|---|
 | 1 | Run `prepro_auto` in CMD | Starts the UI server. Open `http://127.0.0.1:8000/workbench` and drag-drop a file. |
 | 2 | `session = prepro_auto.launch_file(path, open_browser=True)` | Reads the file from a notebook and opens its dataset session in the UI. |
-| 3 | `result = prepro_auto.quickclean(path, apply_all=True, verbose=False)` | Applies all recommendations and returns `result.df`. Use `session.update(result.df)` to show the result in an existing UI session. |
+| 3 | `session = prepro_auto.launch(df, open_browser=True)` | Opens an existing DataFrame for guided review in the workbench. |
 | 4 | `df = session.current()` and `session.update(df)` | Pulls the latest UI-edited data into the notebook, then pushes notebook edits back to the UI. |
 
 ### Supported file formats
@@ -293,7 +292,6 @@ For PDFs with merged cells or complex layouts, try `camelot-py` (better for bord
 
 | Function | Returns | What it does |
 |---|---|---|
-| `prepro_auto.quickclean(r"path\to\data", target=None, threshold=0.90, apply_all=False, stages=None, dataset_type="tabular")` | `CleanResult` (`.df`, `.report`, `.review`, `.job_id`) | Reads and cleans a file without a browser. Applies confident recommendations by default; `apply_all=True` applies all recommendations. |
 | `prepro_auto.launch_file(r"path\to\data", domain="general", dataset_type="tabular", port=None, open_browser=False)` | `Session` | Reads a supported file, starts the local workbench, and prints its session URL. Set `open_browser=True` to open it automatically. |
 | `prepro_auto.launch(df, domain="general", dataset_type="tabular", port=None, open_browser=False)` | `Session` | Opens a pandas DataFrame in the workbench and returns its session. |
 
@@ -303,7 +301,7 @@ Use the file's actual extension in `r"path\to\data"`, such as `.csv`, `.xlsx`, o
 
 ## Notebook and UI synchronization
 
-The link is the **job ID**, not the filename. Every `launch_file()` call, UI upload or path-based `quickclean()` creates an independent job. Reuse `session` to keep one dataset and history. Use the full `session.url`, including its port and `?job=...`.
+The link is the **job ID**, not the filename. Every `launch_file()` call or UI upload creates an independent job. Reuse `session` to keep one dataset and history. Use the full `session.url`, including its port and `?job=...`.
 
 To resume the dataset currently open in the UI, click **Copy notebook connection** in the sidebar and paste the code into your notebook. Equivalently:
 
@@ -320,8 +318,7 @@ display(df.head())
 `connect()` preserves the existing dataset and history. If a kernel restart stopped its local server, it starts a server and prints the preserved job's URL. Both interfaces must use the same database/storage configuration; the helper checks the server revision rather than silently attaching to a different store. CLI defaults to port 8000; notebook launch prefers 8721 and can choose another free port. Use the printed URL.
 
 ```python
-# Same job, no separate file upload or result push required:
-result = prepro_auto.quickclean(session, apply_all=True, verbose=False)
+# Review and execute cleaning decisions in this session's workbench.
 
 # Pull again before editing after UI changes:
 df = session.current()
@@ -360,7 +357,7 @@ The browser, notebook bridge and REST routes use the same services. Routes below
 | `POST /decisions/{decision_id}/drop-column` | Mark the column for removal. |
 | `POST /datasets/{job_id}/stages/{stage_name}/execute` | Apply settled decisions and commit a version. |
 
-Analysis and approval are separate from execution. Quickclean automates the same sequence according to `threshold`/`apply_all`. Review `result.review` and `result.report` when no changes were applied. Confidence is a recommendation score, not a guarantee of better model performance.
+Analysis and approval are separate from execution. Review the decision cards and their evidence, choose actions, then execute each stage. Some recommendations are auto-approved by confidence; review or skip those before executing as well. Confidence is a recommendation score, not a guarantee of better model performance.
 
 Evidence is stored when analysis runs. After subsequent edits, a card's sample still describes its source version; the payload identifies both source and current versions. Global findings show context rather than asserting that every displayed row is invalid.
 
@@ -438,7 +435,6 @@ The artifacts you take away from a session. Notebook methods return Python objec
 
 | Method | Returns | Where to use it |
 |---|---|---|
-| `prepro_auto.quickclean(data)` | `CleanResult` — `.df` (cleaned DataFrame), `.report` (per-stage summary), `.job_id` | Headless one-call clean. `result.df` drops straight into `model.fit(X, y)`; `print(result)` shows what was applied vs. left for review. |
 | `session.current()` | pandas DataFrame | The current (active-version) DataFrame as it stands in the UI right now. Drop straight into `model.fit(X, y)`. Warns if the UI holds approved decisions whose stage has not been executed — those are not in the data yet. |
 | `session.update(df)` | the same `Session` | Pushes a notebook-edited DataFrame as a new undoable version; an open workbench tab refreshes itself within ~2s. Decision cards computed against the replaced data are cleared so the UI re-analyses (`reanalyze=False` keeps them). |
 | `session.evidence(decision_id)` | dict | Up to five real rows captured when a cleaning card was analysed, with source version, row positions, index labels and selection statistics. |
@@ -481,6 +477,47 @@ model.fit(X, y)
 ## 4. Train functions (optional ML layer)
 
 The workflow is **split preview -> candidate selection -> tuning plan -> CV comparison -> champion evaluation**. Candidates compete on training-fold scores. Only the selected champion receives the final held-out test evaluation.
+
+### Keep frontend inputs and predicted prices in original units
+
+Use the Clean section to inspect findings and choose corrections. Keep learned model preparation inside the fitted training pipeline: its imputation, scaling and encoding are fitted within training folds and saved with the model. Stage analysis does not change the dataframe; executing approved or auto-approved decisions does.
+
+Start with data in original units. For house prices, keep numerical bedroom/bathroom counts, square feet and the original price units. Resolve domain-specific formats such as `"2 BHK"`, square-foot ranges and mixed units deliberately before training. Missing targets are excluded by training rather than filled with invented labels. Review suspected leakage and invalid data before fitting; analysis alone does not resolve them.
+
+```python
+# session must contain data BEFORE automatic scaling/encoding.
+# Use the exact column names in your dataset.
+df = session.current()
+
+trained = prepro_auto.train(
+    df,
+    target="price",
+    features=["location", "Bedroom", "bath", "total_sqft"],
+    problem="regression",
+    models=["linear_regression", "random_forest"],
+    mode="trusted",
+)
+print(trained.contract())
+print(trained.predict({
+    "location": "Whitefield", "Bedroom": 2, "bath": 2, "total_sqft": 1200,
+}))
+trained.export("house_price.joblib")
+```
+
+Load the complete exported pipeline in your Python backend. The frontend sends ordinary input values; the pipeline applies its fitted transformations. The prediction uses the units of the target supplied during training (for example, lakhs if `price` was in lakhs).
+
+```python
+import joblib
+import pandas as pd
+
+bundle = joblib.load("house_price.joblib")
+inputs = pd.DataFrame([{
+    "location": "Whitefield", "Bedroom": 2, "bath": 2, "total_sqft": 1200,
+}])
+price = float(bundle["pipeline"].predict(inputs)[0])
+```
+
+If earlier cleaning has already scaled your price or encoded your bedroom count, restore the version before those changes or reload the original data and retrain. Casting transformed numbers to integers does not recover the original values. Export the complete training bundle so prediction uses the same fitted preprocessing. Feature preparation fitted on all rows before training can introduce leakage.
 
 ### Manual training
 
@@ -607,7 +644,7 @@ For each experiment, retain the dataset/preparation version, split seed and keys
 | `session.compare(target, models=None, mode="trusted", goal=None, test_size=0.2, cv_folds=5, seed=42, tuning="none", tuning_iter=25, ...)` | `Comparison` | Fit candidates and compare CV scores. `.select(model_id=None)` evaluates the champion once. |
 | `session.ai_plan(instruction, target=None)` | `AIPlan` | Validate an AI proposal; `.compare()` runs the phased comparison and `.train()` auto-selects its CV winner. |
 | `session.train(target, business_goal=None, models=None, test_size=0.2, cv=5, tuning="none", tuning_iter=25, mode="trusted", ...)` | `TrainResult` | One-shot CV comparison, winner selection and final test evaluation. |
-| `prepro_auto.train(data, target, **kwargs)` | `TrainResult` | Accept a Session, CleanResult, DataFrame or supported path. Job-backed inputs can use strict or trusted mode. |
+| `prepro_auto.train(data, target, **kwargs)` | `TrainResult` | Accept a Session, DataFrame or supported path. Job-backed inputs can use strict or trusted mode. |
 
 One-shot training also accepts `features`, `problem`, `metric`, `time_column`, `group_column`, `calibrate`, `tune_threshold`, `importance`, `explain` and `refit_on_full`. Phased comparison uses `goal`/`cv_folds`/`seed`; one-shot training uses `business_goal`/`cv`. `TrainResult` exposes `.report`, `.best`, `.leaderboard`, `.leakage`, `.contract()`, `.predict()` and `.export()`. Non-champions have CV results and no held-out metrics.
 
